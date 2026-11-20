@@ -3,7 +3,8 @@ export interface ChangeEntry {
   id: number;
   at: string;
   /** `view`: someone looked at something logged when seen, e.g. a contractor's full account number. */
-  action: 'create' | 'update' | 'delete' | 'view';
+  /** `restore`: a deleted record brought back (Settings › Change history's Undo). */
+  action: 'create' | 'update' | 'delete' | 'restore' | 'view';
   /** Who made the change; "System" for seeds and jobs. */
   user: string;
   recordId: string;
@@ -15,6 +16,9 @@ export interface ChangeEntry {
 export interface FieldChange {
   /** API column name (snake_case — values inside the array aren't key-transformed). */
   field: string;
-  old: string | number | boolean | null;
-  new: string | number | boolean | null;
+  old: FieldValue;
+  new: FieldValue;
 }
+
+/** A logged value: lists (sections, recipients, tags) come as arrays. */
+export type FieldValue = string | number | boolean | string[] | null;

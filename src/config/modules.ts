@@ -52,11 +52,12 @@ export const MODULES: readonly ModuleDef[] = [
     icon: Settings,
     path: 'settings',
     items: [
-      // Owners only (not grantable to other roles), except Email templates.
+      // Owners only (not grantable to other roles), except Email templates and Change history.
       { key: 'users', label: 'Users and access' },
       { key: 'roles', label: 'Roles and permissions' },
       { key: 'login-history', label: 'Login history' },
       { key: 'email-templates', label: 'Email templates' },
+      { key: 'change-history', label: 'Change history' },
       { key: 'workspace', label: 'Workspace' },
     ],
   },

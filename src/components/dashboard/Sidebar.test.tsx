@@ -107,6 +107,7 @@ describe('Sidebar', () => {
       'view_settings_roles',
       'view_settings_login_history',
       'view_settings_email_templates',
+      'view_settings_change_history',
       'view_settings_workspace',
       'view_platform_usage',
     ]);

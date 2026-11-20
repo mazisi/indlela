@@ -16,6 +16,7 @@ const LoginHistoryPage = lazy(() => import('@/features/users/pages/LoginHistoryP
 const RolesPage = lazy(() => import('@/features/roles/pages/RolesPage'));
 const UsersPage = lazy(() => import('@/features/users/pages/UsersPage'));
 const EmailTemplatesPage = lazy(() => import('@/features/email-templates/pages/EmailTemplatesPage'));
+const ChangeHistoryPage = lazy(() => import('@/features/change-history/pages/ChangeHistoryPage'));
 const WorkspacePage = lazy(() => import('@/features/workspaces/pages/WorkspacePage'));
 const ClientsPage = lazy(() => import('@/features/clients/pages/ClientsPage'));
 const SitesPage = lazy(() => import('@/features/sites/pages/SitesPage'));
@@ -45,6 +46,7 @@ const PAGES: Record<string, ReactNode> = {
   'settings.roles': <RolesPage />,
   'settings.login-history': <LoginHistoryPage />,
   'settings.email-templates': <EmailTemplatesPage />,
+  'settings.change-history': <ChangeHistoryPage />,
   'settings.workspace': <WorkspacePage />,
   'platform.usage': <PlatformUsagePage />,
 };
