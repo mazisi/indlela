@@ -99,7 +99,9 @@ describe('SiteAuditDetailPage', () => {
 
       expect(await screen.findByRole('img', { name: 'Health score 82 out of 100: Good' })).toBeInTheDocument();
       expect(screen.getByRole('heading', { name: 'Karoo Coffee' })).toBeInTheDocument();
-      expect(screen.getByText('Site audit · Karoo Coffee Co')).toBeInTheDocument();
+      const crumbs = screen.getByRole('navigation', { name: 'Breadcrumb' });
+      expect(within(crumbs).getByRole('link', { name: 'Site audit' })).toHaveAttribute('href', '/dashboard/site-audit');
+      expect(within(crumbs).getByText('Karoo Coffee Co')).toBeInTheDocument();
       expect(screen.getByText('Critical issues').closest('button')).toHaveTextContent('3');
       expect(screen.getByText('Warnings').closest('button')).toHaveTextContent('14');
       expect(screen.getByText('Notices').closest('button')).toHaveTextContent('35');

@@ -188,7 +188,7 @@ function AffectedUrls({ auditId, group }: { auditId: number; group: IssueGroup }
       ) : (
         <div className={cn('transition-opacity', query.isFetching && 'opacity-60')}>
           <DataTable rows={rows} columns={columns} rowLabel={(r) => r.url} noun="URLs" />
-          {meta && meta.total > meta.perPage && (
+          {meta && (
             <Paginator
               currentPage={meta.currentPage}
               lastPage={meta.lastPage}

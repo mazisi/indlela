@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { ArrowDown } from 'lucide-react';
+import { SheetCloseFooter } from '@/components/form/SheetCloseFooter';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Skeleton } from '@/components/ui/skeleton';
 import { FormAlert } from '@/features/auth/components/FormAlert';
@@ -161,6 +162,7 @@ export function KeywordDetailSheet({ keyword, onClose }: { keyword: KeywordRef |
             </>
           )}
         </div>
+        <SheetCloseFooter />
       </SheetContent>
     </Sheet>
   );

@@ -17,6 +17,8 @@ export interface WorkspaceRef {
   name: string;
   slug: string;
   logoUrl: string | null;
+  /** #rrggbb for client reports and share links; null = the default. */
+  brandColor?: string | null;
 }
 
 /** A workspace the user belongs to, with their role there (the switcher's list). */

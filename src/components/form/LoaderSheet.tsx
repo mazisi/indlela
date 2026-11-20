@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import type { UseQueryResult } from '@tanstack/react-query';
+import { SheetCloseFooter } from '@/components/form/SheetCloseFooter';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { FormSkeleton } from '@/components/skeletons/FormSkeleton';
 import { FormAlert } from '@/features/auth/components/FormAlert';
@@ -35,6 +36,7 @@ export function LoaderSheet<T extends { id: number }>({ id, query, onOpenChange,
           // The drawer that opens varies (edit, review, complete…), so a general form shape.
           <FormSkeleton label={`Loading the ${noun}`} rows={[{ fields: 2 }, { fields: 2 }, { fields: 1 }, { fields: 1, box: 'textarea' }]} />
         )}
+        <SheetCloseFooter />
       </SheetContent>
     </Sheet>
   );

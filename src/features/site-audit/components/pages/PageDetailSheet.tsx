@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { CheckCircle2, ExternalLink } from 'lucide-react';
+import { SheetCloseFooter } from '@/components/form/SheetCloseFooter';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Skeleton } from '@/components/ui/skeleton';
 import { FormAlert } from '@/features/auth/components/FormAlert';
@@ -56,6 +57,7 @@ export function PageDetailSheet({ auditId, pageId, onClose }: Props) {
             <PageDetail page={data} />
           )}
         </div>
+        <SheetCloseFooter />
       </SheetContent>
     </Sheet>
   );

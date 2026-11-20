@@ -1,30 +1,43 @@
+import { useId } from 'react';
 import { formatNumber } from '@/features/search-console/lib/format';
 import { ChangeBadge } from '@/features/search-console/components/ChangeBadge';
 import { DISTRIBUTION_SEGMENTS } from '../../lib/position';
 import type { Distribution } from '../../types';
 
 /** One hue, darkest for the best bucket; "not ranking" is neutral grey. */
-const FILL: Record<keyof Distribution, string> = {
-  top3: 'var(--chart-current)',
-  top10: 'color-mix(in oklab, var(--chart-current) 70%, var(--card))',
-  top20: 'color-mix(in oklab, var(--chart-current) 45%, var(--card))',
-  top100: 'color-mix(in oklab, var(--chart-current) 25%, var(--card))',
+const fills = (color: string): Record<keyof Distribution, string> => ({
+  top3: color,
+  top10: `color-mix(in oklab, ${color} 70%, var(--card))`,
+  top20: `color-mix(in oklab, ${color} 45%, var(--card))`,
+  top100: `color-mix(in oklab, ${color} 25%, var(--card))`,
   notRanking: 'color-mix(in oklab, var(--chart-compare) 35%, var(--card))',
-};
+});
+
+interface Props {
+  distribution: Distribution;
+  before: Distribution | null;
+  /** What `before` is, for screen readers. */
+  context?: string;
+  /** The series hue (white-label reports use the agency's colour). */
+  color?: string;
+  title?: string;
+}
 
 /**
  * How the tracked keywords spread over Google's pages: one stacked bar
  * (best bucket first), with each bucket's count and its change over the week
  * in the legend, which also carries the figures for screen readers.
  */
-export function DistributionBar({ distribution, before }: { distribution: Distribution; before: Distribution | null }) {
+export function DistributionBar({ distribution, before, context = 'vs 7 days ago', color = 'var(--chart-current)', title = 'Ranking distribution' }: Props) {
+  const FILL = fills(color);
+  const titleId = useId();
   const total = DISTRIBUTION_SEGMENTS.reduce((n, s) => n + distribution[s.key], 0);
 
   return (
-    <section className="rounded border bg-card shadow-xs" aria-labelledby="rank-distribution-title">
+    <section className="rounded border bg-card shadow-xs" aria-labelledby={titleId}>
       <header className="flex items-baseline justify-between gap-2 border-b px-4 py-2.5">
-        <h2 id="rank-distribution-title" className="text-sm font-semibold">
-          Ranking distribution
+        <h2 id={titleId} className="text-sm font-semibold">
+          {title}
         </h2>
         <p className="text-xs text-muted-foreground">{formatNumber(total)} keywords</p>
       </header>
@@ -50,7 +63,7 @@ export function DistributionBar({ distribution, before }: { distribution: Distri
               <span className="flex items-center gap-1">
                 <span className="font-semibold tabular-nums text-foreground">{formatNumber(distribution[s.key])}</span>
                 {before && s.key !== 'notRanking' && (
-                  <ChangeBadge value={distribution[s.key] - before[s.key]} format={(n) => formatNumber(n)} label={s.label} context="vs 7 days ago" className="px-1 py-0 text-2xs" />
+                  <ChangeBadge value={distribution[s.key] - before[s.key]} format={(n) => formatNumber(n)} label={s.label} context={context} className="px-1 py-0 text-2xs" />
                 )}
               </span>
             </li>
