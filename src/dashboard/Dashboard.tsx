@@ -39,7 +39,8 @@ export default function Dashboard() {
     );
   }
 
-  const modules = MODULES.filter((m) => m.key !== 'dashboard');
+  // Internal modules (Platform) are listed only for those who can open them.
+  const modules = MODULES.filter((m) => m.key !== 'dashboard' && !(m.internal && levelFor(m.key) === 'none'));
 
   return (
     <div className="space-y-5 p-4 sm:p-6">

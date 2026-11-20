@@ -1,4 +1,4 @@
-import { Building2, FileBarChart, LayoutDashboard, ScanSearch, Search, Settings, TrendingUp, type LucideIcon } from 'lucide-react';
+import { Building2, FileBarChart, Gauge, LayoutDashboard, ScanSearch, Search, Settings, TrendingUp, type LucideIcon } from 'lucide-react';
 
 /**
  * The menu. Access is per page: each sub-item (or a module without
@@ -24,9 +24,11 @@ export interface ModuleDef {
   /** Route segment under /dashboard ('' = the dashboard itself). */
   path: string;
   items?: readonly SubItem[];
+  /** Indlela staff only: left out wherever the user has no access (never shown as "No access"). */
+  internal?: boolean;
 }
 
-export type ModuleKey = 'dashboard' | 'clients' | 'search_console' | 'site_audit' | 'rank_tracking' | 'reports' | 'settings';
+export type ModuleKey = 'dashboard' | 'clients' | 'search_console' | 'site_audit' | 'rank_tracking' | 'reports' | 'settings' | 'platform';
 
 export const MODULES: readonly ModuleDef[] = [
   { key: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '' },
@@ -57,6 +59,16 @@ export const MODULES: readonly ModuleDef[] = [
       { key: 'email-templates', label: 'Email templates' },
       { key: 'workspace', label: 'Workspace' },
     ],
+  },
+  {
+    // Indlela staff only: `view_platform_usage` exists only in the company's own
+    // workspace, so for everyone else the whole group stays out of the menu.
+    key: 'platform',
+    label: 'Platform',
+    icon: Gauge,
+    path: 'platform',
+    internal: true,
+    items: [{ key: 'usage', label: 'Usage' }],
   },
 ];
 
