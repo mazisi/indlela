@@ -25,6 +25,9 @@ const SiteAuditPage = lazy(() => import('@/features/site-audit/pages/SiteAuditPa
 const SiteAuditDetailPage = lazy(() => import('@/features/site-audit/pages/SiteAuditDetailPage'));
 const RankTrackingPage = lazy(() => import('@/features/rank-tracking/pages/RankTrackingPage'));
 const RankTrackingSitePage = lazy(() => import('@/features/rank-tracking/pages/RankTrackingSitePage'));
+const LocalGridPage = lazy(() => import('@/features/local-grid/pages/LocalGridPage'));
+const LocalGridSitePage = lazy(() => import('@/features/local-grid/pages/LocalGridSitePage'));
+const LocalGridDetailPage = lazy(() => import('@/features/local-grid/pages/LocalGridDetailPage'));
 const ReportsPage = lazy(() => import('@/features/reports/pages/ReportsPage'));
 const ReportsSitePage = lazy(() => import('@/features/reports/pages/ReportsSitePage'));
 const ReportPreviewPage = lazy(() => import('@/features/reports/pages/ReportPreviewPage'));
@@ -41,6 +44,7 @@ const PAGES: Record<string, ReactNode> = {
   search_console: <SearchConsolePage />,
   site_audit: <SiteAuditPage />,
   rank_tracking: <RankTrackingPage />,
+  local_grid: <LocalGridPage />,
   reports: <ReportsPage />,
   'settings.users': <UsersPage />,
   'settings.roles': <RolesPage />,
@@ -55,6 +59,10 @@ const PAGES: Record<string, ReactNode> = {
 const SUB_PAGES: Record<string, { path: string; element: ReactNode }[]> = {
   site_audit: [{ path: ':siteId', element: <SiteAuditDetailPage /> }],
   rank_tracking: [{ path: ':siteId', element: <RankTrackingSitePage /> }],
+  local_grid: [
+    { path: ':siteId', element: <LocalGridSitePage /> },
+    { path: ':siteId/:gridId', element: <LocalGridDetailPage /> },
+  ],
   reports: [
     { path: ':siteId', element: <ReportsSitePage /> },
     { path: ':siteId/:reportId', element: <ReportPreviewPage /> },

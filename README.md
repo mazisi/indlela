@@ -28,3 +28,4 @@ Checks: `npm run build`, `npm run lint`, `npx vitest run`.
 | `/dashboard/clients/clients`, `/dashboard/clients/sites` | Clients and their sites |
 | `/dashboard/settings/{users,roles,login-history,email-templates,workspace}` | Settings |
 | `/dashboard/{search-console,site-audit,rank-tracking,reports}` | Permission-guarded placeholders |
+| `/dashboard/local-grid`, `/local-grid/:siteId`, `/local-grid/:siteId/:gridId` | Local map pack grid: overview, a site's grids, a grid's heatmap (Leaflet; tiles from `VITE_MAP_TILE_URL`) |

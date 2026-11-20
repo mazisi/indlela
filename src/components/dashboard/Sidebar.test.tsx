@@ -102,6 +102,7 @@ describe('Sidebar', () => {
       'view_search_console',
       'view_site_audit',
       'view_rank_tracking',
+      'view_local_grid',
       'view_reports',
       'view_settings_users',
       'view_settings_roles',

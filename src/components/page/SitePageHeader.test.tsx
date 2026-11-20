@@ -29,14 +29,15 @@ describe('SitePageHeader', () => {
   });
 
   it('links to the same site in the other modules the user can open', () => {
-    permissions.list = ['view_reports', 'view_site_audit', 'view_search_console'];
+    permissions.list = ['view_reports', 'view_site_audit', 'view_search_console', 'view_local_grid'];
     renderHeader();
 
     const tabs = screen.getByRole('navigation', { name: 'Joburg Hire in other modules' });
     const links = within(tabs).getAllByRole('link');
-    expect(links.map((l) => l.textContent)).toEqual(['Search Console', 'Site audit', 'Reports']);
+    expect(links.map((l) => l.textContent)).toEqual(['Search Console', 'Site audit', 'Local grid', 'Reports']);
     expect(within(tabs).getByRole('link', { name: 'Search Console' })).toHaveAttribute('href', '/dashboard/search-console?site=7');
     expect(within(tabs).getByRole('link', { name: 'Site audit' })).toHaveAttribute('href', '/dashboard/site-audit/7');
+    expect(within(tabs).getByRole('link', { name: 'Local grid' })).toHaveAttribute('href', '/dashboard/local-grid/7');
     expect(within(tabs).getByRole('link', { name: 'Reports' })).toHaveAttribute('aria-current', 'page');
   });
 
