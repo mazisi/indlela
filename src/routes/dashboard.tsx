@@ -20,6 +20,8 @@ const WorkspacePage = lazy(() => import('@/features/workspaces/pages/WorkspacePa
 const ClientsPage = lazy(() => import('@/features/clients/pages/ClientsPage'));
 const SitesPage = lazy(() => import('@/features/sites/pages/SitesPage'));
 const SearchConsolePage = lazy(() => import('@/features/search-console/pages/SearchConsolePage'));
+const SiteAuditPage = lazy(() => import('@/features/site-audit/pages/SiteAuditPage'));
+const SiteAuditDetailPage = lazy(() => import('@/features/site-audit/pages/SiteAuditDetailPage'));
 
 // Friendly fallback when a lazy route chunk fails to load (network/deploy mismatch).
 const boundary = (element: ReactNode) => <SimpleErrorBoundary fallback={<ErrorFallback />}>{element}</SimpleErrorBoundary>;
@@ -30,6 +32,7 @@ const PAGES: Record<string, ReactNode> = {
   'clients.clients': <ClientsPage />,
   'clients.sites': <SitesPage />,
   search_console: <SearchConsolePage />,
+  site_audit: <SiteAuditPage />,
   'settings.users': <UsersPage />,
   'settings.roles': <RolesPage />,
   'settings.login-history': <LoginHistoryPage />,
@@ -37,9 +40,22 @@ const PAGES: Record<string, ReactNode> = {
   'settings.workspace': <WorkspacePage />,
 };
 
+/** Pages under a module without sub-items (e.g. a site's audit), guarded like the module itself. */
+const SUB_PAGES: Record<string, { path: string; element: ReactNode }[]> = {
+  site_audit: [{ path: ':siteId', element: <SiteAuditDetailPage /> }],
+};
+
 // Every menu entry from the catalogue becomes a permission-guarded route.
 const moduleRoutes: RouteObject[] = MODULES.filter((m) => m.path !== '').map((m) =>
-  m.items
+  SUB_PAGES[m.key]
+    ? {
+        path: m.path,
+        children: [
+          { index: true, element: guarded(permissionFor(m), PAGES[m.key] ?? <ModulePlaceholder moduleKey={m.key} />) },
+          ...SUB_PAGES[m.key].map((sub) => ({ path: sub.path, element: guarded(permissionFor(m), sub.element) })),
+        ],
+      }
+    : m.items
     ? {
         path: m.path,
         children: [

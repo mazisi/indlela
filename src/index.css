@@ -125,6 +125,12 @@
   --warn-soft: #faefd8;
   --bad: #ad2a1f;
   --bad-soft: #fbe4e1;
+  /* Status fills for large marks (health gauge bands). Brighter than the
+     --ok/--warn/--bad text tokens; fixed in both themes and always shown
+     with a written label, never colour alone. */
+  --gauge-good: #0ca30c;
+  --gauge-fair: #fab219;
+  --gauge-poor: #d03b3b;
   /* Independent contractors (prototype's IC tag). */
   --ic: #5b3aa0;
   --ic-soft: #efe7fb;
