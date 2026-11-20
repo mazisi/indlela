@@ -24,6 +24,9 @@ const SiteAuditPage = lazy(() => import('@/features/site-audit/pages/SiteAuditPa
 const SiteAuditDetailPage = lazy(() => import('@/features/site-audit/pages/SiteAuditDetailPage'));
 const RankTrackingPage = lazy(() => import('@/features/rank-tracking/pages/RankTrackingPage'));
 const RankTrackingSitePage = lazy(() => import('@/features/rank-tracking/pages/RankTrackingSitePage'));
+const ReportsPage = lazy(() => import('@/features/reports/pages/ReportsPage'));
+const ReportsSitePage = lazy(() => import('@/features/reports/pages/ReportsSitePage'));
+const ReportPreviewPage = lazy(() => import('@/features/reports/pages/ReportPreviewPage'));
 const PlatformUsagePage = lazy(() => import('@/features/platform/pages/PlatformUsagePage'));
 
 // Friendly fallback when a lazy route chunk fails to load (network/deploy mismatch).
@@ -37,6 +40,7 @@ const PAGES: Record<string, ReactNode> = {
   search_console: <SearchConsolePage />,
   site_audit: <SiteAuditPage />,
   rank_tracking: <RankTrackingPage />,
+  reports: <ReportsPage />,
   'settings.users': <UsersPage />,
   'settings.roles': <RolesPage />,
   'settings.login-history': <LoginHistoryPage />,
@@ -49,6 +53,10 @@ const PAGES: Record<string, ReactNode> = {
 const SUB_PAGES: Record<string, { path: string; element: ReactNode }[]> = {
   site_audit: [{ path: ':siteId', element: <SiteAuditDetailPage /> }],
   rank_tracking: [{ path: ':siteId', element: <RankTrackingSitePage /> }],
+  reports: [
+    { path: ':siteId', element: <ReportsSitePage /> },
+    { path: ':siteId/:reportId', element: <ReportPreviewPage /> },
+  ],
 };
 
 // Every menu entry from the catalogue becomes a permission-guarded route.

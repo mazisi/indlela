@@ -16,11 +16,12 @@ import { FormField } from '@/features/auth/components/FormField';
 import { fieldAria } from '@/features/auth/lib/fieldAria';
 import showToaster from '@/utils/showToaster';
 import { getApiErrorMessage, handleApiValidationError } from '@/utils/formErrorHandler';
+import { BrandColorCard } from '../components/BrandColorCard';
 import { WorkspaceLogo } from '../components/WorkspaceLogo';
 import { useUpdateWorkspace, useWorkspace, useWorkspaceHistory } from '../hooks/useWorkspace';
 
 const PAGE_TITLE = 'Workspace';
-const FIELD_LABELS: Record<string, string> = { name: 'Name', logo_path: 'Logo', slug: 'Address' };
+const FIELD_LABELS: Record<string, string> = { name: 'Name', logo_path: 'Logo', slug: 'Address', brand_color: 'Brand colour' };
 const LOGO_TYPES = 'image/png,image/jpeg,image/svg+xml,image/webp';
 const MAX_LOGO = 2 * 1024 * 1024;
 
@@ -28,8 +29,8 @@ const nameSchema = z.object({ name: z.string().trim().min(2, 'Enter the workspac
 type NameValues = z.infer<typeof nameSchema>;
 
 /**
- * Settings › Workspace (Owners): the agency or business name and the logo
- * used on white-label reports.
+ * Settings › Workspace (Owners): the agency or business name, and the logo
+ * and brand colour used on white-label reports.
  */
 export default function WorkspacePage() {
   const { hasPermission } = usePermissions();
@@ -81,7 +82,7 @@ export default function WorkspacePage() {
       <PageHeader
         eyebrow="Settings · Owner"
         title={PAGE_TITLE}
-        description="Your agency or business. The name shows in the workspace switcher; the logo goes on your white-label reports."
+        description="Your agency or business. The name shows in the workspace switcher; the name, logo and brand colour go on your white-label client reports."
         actions={
           <Button
             variant="outline"
@@ -138,7 +139,7 @@ export default function WorkspacePage() {
           <Card className="rounded">
             <CardHeader>
               <CardTitle className="text-base">Logo</CardTitle>
-              <CardDescription>PNG, JPG, SVG or WebP, up to 2 MB. Shown on reports and in the sidebar.</CardDescription>
+              <CardDescription>PNG, JPG, SVG or WebP, up to 2 MB. Shown on client reports and share links, and in the sidebar.</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-wrap items-center gap-4">
               {workspace ? <WorkspaceLogo workspace={workspace} className="size-16 text-xl" /> : <Skeleton className="size-16 rounded" />}
@@ -165,6 +166,8 @@ export default function WorkspacePage() {
               )}
             </CardContent>
           </Card>
+
+          <BrandColorCard workspace={workspace} canUpdate={canUpdate} />
         </div>
       )}
 

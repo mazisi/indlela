@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { AlertOctagon, Activity, ScanSearch, Search, SearchX, Timer } from 'lucide-react';
+import { Paginator } from '@/components/Paginator';
+import { useClientPagination } from '@/hooks/useClientPagination';
 import { Head } from '@/components/ui/Head';
 import { Input } from '@/components/ui/input';
 import { PageHeader } from '@/components/page/PageHeader';
@@ -52,6 +54,7 @@ export default function SiteAuditPage() {
   const q = search.trim().toLowerCase();
   const all = [...(sites.data ?? [])].sort((a, b) => (a.client?.name ?? '').localeCompare(b.client?.name ?? '') || a.name.localeCompare(b.name));
   const shown = q ? all.filter((s) => matches(s, q)) : all;
+  const paging = useClientPagination(shown);
   const summary = summarise(all);
 
   return (
@@ -101,7 +104,10 @@ export default function SiteAuditPage() {
 
           <div className="relative sm:w-80">
             <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
-            <Input type="search" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search sites or clients" aria-label="Search sites or clients" className="bg-card pl-9" />
+            <Input type="search" value={search} onChange={(e) => {
+                setSearch(e.target.value);
+                paging.reset();
+              }} placeholder="Search sites or clients" aria-label="Search sites or clients" className="bg-card pl-9" />
           </div>
 
           {shown.length === 0 ? (
@@ -111,7 +117,17 @@ export default function SiteAuditPage() {
               <p className="text-sm text-muted-foreground">Try a shorter or different search.</p>
             </div>
           ) : (
-            <SitesTable sites={shown} />
+            <div>
+              <SitesTable sites={paging.pageRows} />
+              <Paginator
+                currentPage={paging.meta.currentPage}
+                lastPage={paging.meta.lastPage}
+                totalItems={paging.meta.total}
+                perPage={paging.meta.perPage}
+                onPageChange={paging.onPageChange}
+                onPerPageChange={paging.onPerPageChange}
+              />
+            </div>
           )}
         </>
       )}

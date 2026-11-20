@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { Link, useParams } from 'react-router';
-import { ArrowLeft, Plus } from 'lucide-react';
+import { useParams } from 'react-router';
+import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Head } from '@/components/ui/Head';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { PageHeader } from '@/components/page/PageHeader';
+import { SitePageHeader } from '@/components/page/SitePageHeader';
 import { usePermissions } from '@/contexts/PermissionContextType';
 import { FormAlert } from '@/features/auth/components/FormAlert';
 import { formatNumber } from '@/features/search-console/lib/format';
@@ -55,20 +55,10 @@ export default function RankTrackingSitePage() {
   return (
     <div className="space-y-4 p-4 sm:p-6">
       <Head title={site ? `${site.name} · Rank tracking` : 'Rank tracking'} />
-      <Link to="/dashboard/rank-tracking" className="-mb-2 inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-primary">
-        <ArrowLeft className="size-3.5" aria-hidden />
-        All sites
-      </Link>
-      <PageHeader
-        eyebrow={site?.client ? `Rank tracking · ${site.client.name}` : 'Rank tracking'}
-        title={site?.name ?? (sites.isPending ? 'Loading…' : 'Rank tracking')}
-        description={
-          site && (
-            <a href={site.url} target="_blank" rel="noreferrer noopener" className="hover:text-primary hover:underline">
-              {site.url}
-            </a>
-          )
-        }
+      <SitePageHeader
+        module="rank_tracking"
+        site={site}
+        loading={sites.isPending}
         actions={
           site && (
             <div className="flex flex-wrap items-center gap-2">

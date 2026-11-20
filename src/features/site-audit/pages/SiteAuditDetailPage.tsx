@@ -1,9 +1,8 @@
 import { useState } from 'react';
-import { Link, useParams } from 'react-router';
-import { ArrowLeft } from 'lucide-react';
+import { useParams } from 'react-router';
 import { Head } from '@/components/ui/Head';
 import { Skeleton } from '@/components/ui/skeleton';
-import { PageHeader } from '@/components/page/PageHeader';
+import { SitePageHeader } from '@/components/page/SitePageHeader';
 import { usePermissions } from '@/contexts/PermissionContextType';
 import { FormAlert } from '@/features/auth/components/FormAlert';
 import { formatDate, formatDateTime } from '@/utils/formatDate';
@@ -53,14 +52,10 @@ export default function SiteAuditDetailPage() {
   return (
     <div className="space-y-4 p-4 sm:p-6">
       <Head title={site ? `${site.name} · Site audit` : 'Site audit'} />
-      <Link to="/dashboard/site-audit" className="-mb-2 inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-primary">
-        <ArrowLeft className="size-3.5" aria-hidden />
-        All sites
-      </Link>
-      <PageHeader
-        eyebrow={site?.client ? `Site audit · ${site.client.name}` : 'Site audit'}
-        title={site?.name ?? (sites.isPending ? 'Loading…' : 'Site audit')}
-        description={site && <a href={site.url} target="_blank" rel="noreferrer noopener" className="hover:text-primary hover:underline">{site.url}</a>}
+      <SitePageHeader
+        module="site_audit"
+        site={site}
+        loading={sites.isPending}
         actions={
           site &&
           state &&

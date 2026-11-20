@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { Loader2, Mail, Send } from 'lucide-react';
+import { Paginator } from '@/components/Paginator';
+import { useClientPagination } from '@/hooks/useClientPagination';
 import { Head } from '@/components/ui/Head';
 import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/page/PageHeader';
@@ -64,6 +66,7 @@ export default function EmailTemplatesPage() {
   const test = useSendTest();
   const open = d?.data.find((t) => t.type === editing);
   const rows: Row[] = (d?.data ?? []).map((t, i) => ({ ...t, id: i }));
+  const paging = useClientPagination(rows);
 
   const onTest = async (t: EmailTemplate) => {
     try {
@@ -79,7 +82,7 @@ export default function EmailTemplatesPage() {
       <PageHeader
         eyebrow="Settings"
         title="Email templates"
-        description="The wording of every email Indlela sends for this workspace: sign-in PINs, password resets and invitations. Placeholders are filled in when an email is sent."
+        description="The wording of every email sent for this workspace: sign-in PINs, password resets, invitations and client reports. Placeholders are filled in when an email is sent."
       />
 
       {d && (
@@ -105,31 +108,41 @@ export default function EmailTemplatesPage() {
           <p className="text-sm text-muted-foreground">No emails.</p>
         </div>
       ) : (
-        <DataTable
-          rows={rows}
-          columns={COLUMNS}
-          noun="emails"
-          rowLabel={(t) => t.label}
-          onRowClick={(t) => setEditing(t.type)}
-          actions={{
-            onEdit: (t) => setEditing(t.type),
-            extra: d.can.update
-              ? (t) => (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="size-6 text-primary hover:text-primary/80"
-                    onClick={() => void onTest(t)}
-                    disabled={test.isPending && test.variables === t.type}
-                    aria-label={`Send a test of ${t.label}`}
-                    title="Send a test to yourself"
-                  >
-                    {test.isPending && test.variables === t.type ? <Loader2 className="size-3.5 animate-spin" /> : <Send className="size-3.5" />}
-                  </Button>
-                )
-              : undefined,
-          }}
-        />
+        <div>
+          <DataTable
+            rows={paging.pageRows}
+            columns={COLUMNS}
+            noun="emails"
+            rowLabel={(t) => t.label}
+            onRowClick={(t) => setEditing(t.type)}
+            actions={{
+              onEdit: (t) => setEditing(t.type),
+              extra: d.can.update
+                ? (t) => (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="size-6 text-primary hover:text-primary/80"
+                      onClick={() => void onTest(t)}
+                      disabled={test.isPending && test.variables === t.type}
+                      aria-label={`Send a test of ${t.label}`}
+                      title="Send a test to yourself"
+                    >
+                      {test.isPending && test.variables === t.type ? <Loader2 className="size-3.5 animate-spin" /> : <Send className="size-3.5" />}
+                    </Button>
+                  )
+                : undefined,
+            }}
+          />
+          <Paginator
+            currentPage={paging.meta.currentPage}
+            lastPage={paging.meta.lastPage}
+            totalItems={paging.meta.total}
+            perPage={paging.meta.perPage}
+            onPageChange={paging.onPageChange}
+            onPerPageChange={paging.onPerPageChange}
+          />
+        </div>
       )}
 
       {open && d && <TemplateSheet key={open.type} template={open} page={d} onOpenChange={(o) => !o && setEditing(null)} />}

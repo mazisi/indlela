@@ -13,10 +13,12 @@ export interface WorkspaceUpdate {
   name?: string;
   logo?: File | null;
   removeLogo?: boolean;
+  /** #rrggbb, or null for the default. */
+  brandColor?: string | null;
 }
 
 /**
- * PATCH /workspace with `name`, `logo` (image ≤ 2 MB) or `remove_logo`. Sent
+ * PATCH /workspace with `name`, `logo` (image ≤ 2 MB), `remove_logo` or `brand_color`. Sent
  * as multipart POST with `_method=PATCH`: PHP only parses multipart bodies on
  * POST, and Laravel routes the spoofed method to the PATCH route. FormData
  * keys aren't case-transformed, so they are snake_case here.
@@ -27,6 +29,8 @@ export async function updateWorkspace(input: WorkspaceUpdate): Promise<Workspace
   if (input.name !== undefined) body.append('name', input.name);
   if (input.logo) body.append('logo', input.logo);
   if (input.removeLogo) body.append('remove_logo', '1');
+  // Empty clears it (Laravel turns '' into null).
+  if (input.brandColor !== undefined) body.append('brand_color', input.brandColor ?? '');
   const { data } = await axiosClient.post<{ data: WorkspaceRef }>('/workspace', body);
   return data.data;
 }

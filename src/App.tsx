@@ -28,6 +28,12 @@ function RouteProgressBar() {
   return null;
 }
 
+/** Share links (/r/…) are for agencies' clients: no idle sign-out warning there. */
+function AppIdleTimer() {
+  const { pathname } = useLocation();
+  return pathname.startsWith('/r/') ? null : <IdleTimer />;
+}
+
 /** Only the signed-in app needs permissions; auth pages must not fetch them. */
 function ConditionalPermissionProvider({ children }: { children: React.ReactNode }) {
   const location = useLocation();
@@ -41,7 +47,7 @@ export default function App() {
       <ConditionalPermissionProvider>
         <Suspense fallback={null}>
           <AppRoutes />
-          <IdleTimer />
+          <AppIdleTimer />
         </Suspense>
       </ConditionalPermissionProvider>
     </BrowserRouter>

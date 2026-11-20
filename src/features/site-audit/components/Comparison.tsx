@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { CheckCircle2, GitCompareArrows, SearchX } from 'lucide-react';
+import { SheetCloseFooter } from '@/components/form/SheetCloseFooter';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Segmented } from '@/components/form/Segmented';
 import { Paginator } from '@/components/Paginator';
@@ -138,6 +139,7 @@ export function ComparisonSheet({ auditId, comparison, previousDate, filter, onF
             </div>
           )}
         </div>
+        <SheetCloseFooter />
       </SheetContent>
     </Sheet>
   );

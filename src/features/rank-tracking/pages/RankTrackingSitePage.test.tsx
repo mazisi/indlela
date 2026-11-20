@@ -95,6 +95,11 @@ describe('RankTrackingSitePage', () => {
       const drawer = await screen.findByRole('dialog');
       expect(within(drawer).getByText('coffee subscription')).toBeInTheDocument();
       expect(api.getKeywordHistory).toHaveBeenCalledWith(503);
+
+      // Every drawer closes from its footer too.
+      const footer = drawer.querySelector('[data-slot="sheet-footer"]') as HTMLElement;
+      await userEvent.click(within(footer).getByRole('button', { name: 'Close' }));
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     });
   });
 
