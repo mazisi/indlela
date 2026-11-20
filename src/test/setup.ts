@@ -1,5 +1,10 @@
 import '@testing-library/jest-dom/vitest';
 import { beforeEach } from 'vitest';
+import { configure } from '@testing-library/react';
+
+// findBy*/waitFor wait up to 3 s (default 1 s): with 50+ files running in
+// parallel, a page's mocked data can take over a second to render.
+configure({ asyncUtilTimeout: 3000 });
 
 // jsdom does not implement ResizeObserver; cmdk uses it internally.
 globalThis.ResizeObserver = class ResizeObserver {

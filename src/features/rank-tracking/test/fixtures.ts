@@ -1,4 +1,16 @@
-import type { CannibalisedRow, KeywordHistoryPoint, RankKeyword, RankSite, RankSummary, RankUsage } from '../types';
+import type {
+  CannibalisedRow,
+  Competitor,
+  CompetitorAlert,
+  CompetitorOverview,
+  CompetitorSuggestion,
+  HeadToHeadRow,
+  KeywordHistoryPoint,
+  RankKeyword,
+  RankSite,
+  RankSummary,
+  RankUsage,
+} from '../types';
 
 export function rankSite(over: Partial<RankSite> = {}): RankSite {
   return {
@@ -37,6 +49,7 @@ export function keyword(over: Partial<RankKeyword> = {}): RankKeyword {
     weeklyDay: null,
     tags: ['shop'],
     isActive: true,
+    isKey: false,
     position: 4,
     previousPosition: 6,
     change1d: 2,
@@ -118,3 +131,94 @@ export const CANNIBALISED: CannibalisedRow[] = [
     ],
   },
 ];
+
+/* ---- Competitor tracking ---- */
+
+export function competitor(over: Partial<Competitor> = {}): Competitor {
+  return {
+    id: 11,
+    domain: 'beanthere.co.za',
+    name: 'Bean There',
+    isActive: true,
+    createdAt: '2026-10-01T08:00:00Z',
+    latest: { top10: 9, top3: 4, ranked: 18, avgPosition: 7.6, sov: 30 },
+    hasHistory: true,
+    ...over,
+  };
+}
+
+export const COMPETITORS: Competitor[] = [
+  competitor(),
+  competitor({ id: 12, domain: 'truthcoffee.com', name: 'truthcoffee.com', latest: { top10: 6, top3: 1, ranked: 15, avgPosition: 11.2, sov: 20 } }),
+  competitor({ id: 13, domain: 'origincoffee.co.za', name: 'Origin', isActive: false, latest: null }),
+];
+
+const weeks = (n: number, end = '2026-11-16') => {
+  const last = Date.parse(`${end}T00:00:00Z`);
+  return Array.from({ length: n }, (_, i) => new Date(last - (n - 1 - i) * 7 * 86_400_000).toISOString().slice(0, 10));
+};
+
+export function overview(over: Partial<CompetitorOverview> = {}): CompetitorOverview {
+  return {
+    site: { domain: 'karoocoffee.co.za', top10: 15, top3: 5, ranked: 21, avgPosition: 8.4, sov: 50 },
+    competitors: [
+      { id: 12, name: 'truthcoffee.com', domain: 'truthcoffee.com', top10: 6, top3: 1, ranked: 15, avgPosition: 11.2, sov: 20 },
+      { id: 11, name: 'Bean There', domain: 'beanthere.co.za', top10: 9, top3: 4, ranked: 18, avgPosition: 7.6, sov: 30 },
+    ],
+    trend: weeks(4).map((weekStart, i) => ({ weekStart, site: 44 + i * 2, competitors: { '11': 34 - i, '12': 22 - i } })),
+    keywordsTotal: 24,
+    keyKeywords: 3,
+    historySince: '2026-10-27',
+    ...over,
+  };
+}
+
+export const SUGGESTIONS: CompetitorSuggestion[] = [
+  { domain: 'coffeemag.co.za', top10Keywords: 7, keywordsSeen: 12, bestPosition: 2 },
+  { domain: 'takealot.com', top10Keywords: 5, keywordsSeen: 20, bestPosition: 1 },
+];
+
+export function h2hRow(over: Partial<HeadToHeadRow> = {}): HeadToHeadRow {
+  return {
+    id: 501,
+    keywordId: 501,
+    keyword: 'coffee beans johannesburg',
+    locationName: 'Johannesburg',
+    device: 'desktop',
+    isKey: true,
+    ours: { position: 4, change: 2 },
+    competitors: [
+      { id: 11, position: 2, change: 1 },
+      { id: 12, position: 9, change: -3 },
+    ],
+    bestCompetitorPosition: 2,
+    gap: -2,
+    ...over,
+  };
+}
+
+export const H2H_WINNING = h2hRow({
+  id: 502,
+  keywordId: 502,
+  keyword: 'buy espresso machine',
+  isKey: false,
+  ours: { position: 3, change: null },
+  competitors: [
+    { id: 11, position: null, change: null },
+    { id: 12, position: 8, change: 0 },
+  ],
+  bestCompetitorPosition: 8,
+  gap: 5,
+});
+
+export const ALERT: CompetitorAlert = {
+  id: 91,
+  checkedOn: '2026-11-19',
+  keyword: { id: 501, keyword: 'coffee beans johannesburg', locationName: 'Johannesburg', device: 'desktop' },
+  competitor: { id: 11, name: 'Bean There', domain: 'beanthere.co.za' },
+  ourPosition: 4,
+  theirPosition: 2,
+  previousOurPosition: 3,
+  previousTheirPosition: 6,
+  emailedAt: '2026-11-20T05:30:00Z',
+};

@@ -4,10 +4,16 @@ import { cn } from '@/lib/utils';
 import { formatDate } from '@/utils/formatDate';
 import type { KeywordSortKey, RankKeyword } from '../../types';
 import { DeviceIcon, PositionChange, PositionSparkline, Rank, SerpFeatureIcons, Tags } from '../cells';
-import { Muted, PositionCell, UrlCell } from './KeywordCells';
+import { KeyStar, Muted, PositionCell, UrlCell } from './KeywordCells';
+
+/** The star toggle: managers only (undefined shows a plain star on key keywords). */
+export interface KeyToggle {
+  busyId: number | undefined;
+  onToggle: (k: RankKeyword) => void;
+}
 
 /** The Keywords tab's columns; the keyword is a button too, so keyboard users can open its history. */
-export const keywordColumns = (onOpen: (k: RankKeyword) => void): DataColumn<RankKeyword, KeywordSortKey>[] => [
+export const keywordColumns = (onOpen: (k: RankKeyword) => void, keyToggle?: KeyToggle): DataColumn<RankKeyword, KeywordSortKey>[] => [
   {
     label: 'Keyword',
     sortKey: 'keyword',
@@ -15,6 +21,7 @@ export const keywordColumns = (onOpen: (k: RankKeyword) => void): DataColumn<Ran
     cell: (k) => (
       <span className="block min-w-0 max-w-64">
         <span className="flex items-center gap-1.5">
+          <KeyStar k={k} busy={keyToggle?.busyId === k.id} onToggle={keyToggle?.onToggle} />
           <button type="button" onClick={() => onOpen(k)} className="truncate text-left text-sm font-medium text-foreground hover:text-primary hover:underline">
             {k.keyword}
           </button>

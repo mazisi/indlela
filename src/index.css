@@ -146,6 +146,13 @@
   --chart-current: #2a78d6;
   --chart-compare: #828c88;
   --chart-grid: #e6eae8;
+  /* Categorical series in a fixed order (slot 1 is --chart-current): competitor
+     tracking colours the site, then each competitor, with these and never cycles. */
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
+  --series-4: #eda100;
+  --series-5: #e87ba4;
+  --series-6: #008300;
 }
 
 .dark {
@@ -184,6 +191,11 @@
   --chart-current: #3987e5;
   --chart-compare: #7f7e78;
   --chart-grid: oklch(1 0 0 / 8%);
+  --series-2: #d95926;
+  --series-3: #199e70;
+  --series-4: #c98500;
+  --series-5: #d55181;
+  --series-6: #0ca30c;
 }
 
 /* this is for dashboard charts */
