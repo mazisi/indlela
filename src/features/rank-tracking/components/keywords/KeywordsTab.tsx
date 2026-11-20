@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CalendarClock, ChevronDown, Loader2, SearchX } from 'lucide-react';
+import { CalendarClock, ChevronDown, Loader2, SearchX, Star, StarOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils';
 import showToaster from '@/utils/showToaster';
 import { getApiErrorMessage } from '@/utils/formErrorHandler';
 import { useCheckNow } from '../../hooks/useCheckNow';
-import { useBulkKeywords, useDeleteKeyword, useKeywords, useRankUsage } from '../../hooks/useRankTracking';
+import { useBulkKeywords, useDeleteKeyword, useKeywords, useRankUsage, useUpdateKeyword } from '../../hooks/useRankTracking';
 import { checkNowBlocked, checksNowLeft } from '../../lib/usage';
 import { DEVICE_LABEL, FREQUENCY_LABEL, isBucket, isDevice } from '../../lib/position';
 import { KEYWORD_SORT_KEYS, type BulkAction, type Frequency, type RankKeyword } from '../../types';
@@ -35,7 +35,17 @@ interface Props {
 const unique = (values: string[]) => [...new Set(values)].sort((a, b) => a.localeCompare(b));
 const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
 
-const BULK_DONE: Record<BulkAction, string> = { activate: 'resumed', deactivate: 'paused', delete: 'deleted', set_frequency: 'updated' };
+const BULK_DONE: Record<BulkAction, string> = {
+  activate: 'resumed',
+  deactivate: 'paused',
+  delete: 'deleted',
+  set_frequency: 'updated',
+  mark_key: 'marked as key',
+  unmark_key: 'no longer key',
+};
+
+/** Bulk actions with their own button in the bar (the bar's pending state covers only its own three). */
+const OWN_BUTTON: BulkAction[] = ['set_frequency', 'mark_key', 'unmark_key'];
 
 /**
  * A site's tracked keywords: server-paginated, with search, device, location,
@@ -52,18 +62,20 @@ export function KeywordsTab({ siteId, canManage, locations, tags, onOpen }: Prop
   const bucket = isBucket(bucketParam) ? bucketParam : undefined;
   const location = p.get('location') ?? undefined;
   const tag = p.get('tag') ?? undefined;
+  const keyOnly = p.get('key') === '1';
 
-  const query = useKeywords(siteId, { page: list.page, perPage: list.perPage, search: list.search, device, location, tag, bucket, sort });
+  const query = useKeywords(siteId, { page: list.page, perPage: list.perPage, search: list.search, device, location, tag, bucket, isKey: keyOnly || undefined, sort });
   const rows = query.data?.data ?? [];
   const meta = query.data?.meta;
-  const filtered = Boolean(list.search || device || location || tag || bucket);
+  const filtered = Boolean(list.search || device || location || tag || bucket || keyOnly);
 
   const selection = useRowSelection(
     rows.map((r) => r.id),
-    [list.page, list.perPage, list.search, device, location, tag, bucket, sort?.key, sort?.direction].join('|'),
+    [list.page, list.perPage, list.search, device, location, tag, bucket, keyOnly, sort?.key, sort?.direction].join('|'),
   );
   const bulk = useBulkKeywords(siteId);
   const remove = useDeleteKeyword(siteId);
+  const update = useUpdateKeyword(siteId);
   const checkNow = useCheckNow(siteId, query.data?.data);
   const usage = useRankUsage();
   const blocked = checkNowBlocked(usage.data);
@@ -98,7 +110,22 @@ export function KeywordsTab({ siteId, canManage, locations, tags, onOpen }: Prop
       onError: (error) => showToaster('error', getApiErrorMessage(error, 'Could not delete the keyword.')),
     });
 
-  const columns = keywordColumns(onOpen);
+  /** Sends the keyword's settings as they are, with the star flipped. */
+  const toggleKey = (k: RankKeyword) =>
+    update.mutate(
+      {
+        id: k.id,
+        update: { frequency: k.frequency, ...(k.frequency === 'weekly' && k.weeklyDay !== null ? { weeklyDay: k.weeklyDay } : {}), tags: k.tags, isActive: k.isActive, isKey: !k.isKey },
+      },
+      {
+        onSuccess: (row) =>
+          showToaster('success', row.isKey ? `“${row.keyword}” is a key keyword: you'll be alerted when a competitor overtakes you.` : `“${row.keyword}” is no longer a key keyword.`),
+        onError: (error) => showToaster('error', getApiErrorMessage(error, 'Could not update the keyword.')),
+      },
+    );
+
+  const columns = keywordColumns(onOpen, canManage ? { busyId: update.isPending ? update.variables?.id : undefined, onToggle: toggleKey } : undefined);
+  const bulkBusy = (action: BulkAction) => bulk.isPending && bulk.variables?.action === action;
   const optionsFrom = (pick: (r: RankKeyword) => string[]) => unique(rows.flatMap(pick));
 
   return (
@@ -110,6 +137,7 @@ export function KeywordsTab({ siteId, canManage, locations, tags, onOpen }: Prop
         location={location}
         tag={tag}
         bucket={bucket}
+        keyOnly={keyOnly}
         locations={locations ?? optionsFrom((r) => [r.location.name])}
         tags={tags ?? optionsFrom((r) => r.tags)}
         onFilter={(key, value) => list.update({ [key]: value, page: undefined })}
@@ -120,14 +148,22 @@ export function KeywordsTab({ siteId, canManage, locations, tags, onOpen }: Prop
           count={selection.count}
           canUpdate
           canDelete
-          pending={bulk.isPending ? (bulk.variables?.action === 'set_frequency' ? undefined : bulk.variables?.action) : undefined}
+          pending={bulk.isPending && bulk.variables && !OWN_BUTTON.includes(bulk.variables.action) ? (bulk.variables.action as 'activate' | 'deactivate' | 'delete') : undefined}
           onAction={(action) => (action === 'delete' ? setBulkDelete(true) : runBulk(action))}
           onClear={selection.clear}
         >
+          <Button variant="outline" size="sm" disabled={bulk.isPending} onClick={() => runBulk('mark_key')}>
+            {bulkBusy('mark_key') ? <Loader2 className="animate-spin" /> : <Star />}
+            Mark key
+          </Button>
+          <Button variant="outline" size="sm" disabled={bulk.isPending} onClick={() => runBulk('unmark_key')}>
+            {bulkBusy('unmark_key') ? <Loader2 className="animate-spin" /> : <StarOff />}
+            Unmark key
+          </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" disabled={bulk.isPending}>
-                {bulk.isPending && bulk.variables?.action === 'set_frequency' ? <Loader2 className="animate-spin" /> : <CalendarClock />}
+                {bulkBusy('set_frequency') ? <Loader2 className="animate-spin" /> : <CalendarClock />}
                 Set frequency
                 <ChevronDown className="opacity-60" />
               </Button>

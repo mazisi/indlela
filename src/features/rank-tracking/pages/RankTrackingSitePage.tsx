@@ -6,17 +6,17 @@ import { Head } from '@/components/ui/Head';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SitePageHeader } from '@/components/page/SitePageHeader';
 import { usePermissions } from '@/contexts/PermissionContextType';
-import { FormAlert } from '@/features/auth/components/FormAlert';
 import { formatNumber } from '@/features/search-console/lib/format';
-import { getApiErrorMessage } from '@/utils/formErrorHandler';
 import { RANK_TABS, useRankParams, type RankTab } from '../hooks/useRankParams';
 import { useKeywords, useRankSites, useRankSummary, useRankUsage } from '../hooks/useRankTracking';
 import { DEFAULT_PER_PAGE } from '@/types/pagination';
 import type { RankSummary } from '../types';
 import { AddKeywordsSheet } from '../components/add/AddKeywordsSheet';
 import { CannibalisationTab } from '../components/cannibalisation/CannibalisationTab';
+import { CompetitorsTab } from '../components/competitors/CompetitorsTab';
 import { KeywordDetailSheet, type KeywordRef } from '../components/keywords/KeywordDetailSheet';
 import { KeywordsTab } from '../components/keywords/KeywordsTab';
+import { LoadError } from '../components/LoadError';
 import { AllPausedNotice, NoChecksYetNotice, NoKeywordsState, SiteNotFoundState } from '../components/StateCards';
 import { ChecksPausedNotice, UsageStripCompact } from '../components/overview/UsageStrip';
 import { RankSummaryPanel, RankSummarySkeleton } from '../components/summary/RankSummaryPanel';
@@ -31,8 +31,8 @@ const TabCount = ({ n, tone }: { n: number; tone?: 'warn' }) => (
 
 /**
  * One site's rankings: the summary (tiles, trend, distribution, the week's
- * movers, SERP features, cannibalisation), then the Keywords and
- * Cannibalisation tabs (tab, filters and sort in the URL). A keyword opens
+ * movers, SERP features, cannibalisation), then the Keywords,
+ * Cannibalisation and Competitors tabs (tab, filters and sort in the URL). A keyword opens
  * its 90-day history in a drawer; managers add, edit, check and delete.
  */
 export default function RankTrackingSitePage() {
@@ -91,6 +91,7 @@ export default function RankTrackingSitePage() {
       ) : (
         <SiteRankings
           siteId={siteId}
+          siteUrl={site.url}
           summary={summary.data}
           neverChecked={!site.lastCheckedOn}
           canManage={canManage}
@@ -108,6 +109,7 @@ export default function RankTrackingSitePage() {
 
 interface SiteRankingsProps {
   siteId: number;
+  siteUrl: string;
   summary: RankSummary;
   neverChecked: boolean;
   canManage: boolean;
@@ -116,7 +118,7 @@ interface SiteRankingsProps {
   onOpen: (keyword: KeywordRef) => void;
 }
 
-function SiteRankings({ siteId, summary, neverChecked, canManage, tab, onTab, onOpen }: SiteRankingsProps) {
+function SiteRankings({ siteId, siteUrl, summary, neverChecked, canManage, tab, onTab, onOpen }: SiteRankingsProps) {
   return (
     <div className="space-y-4">
       {summary.keywordsCount === 0 ? (
@@ -156,22 +158,10 @@ function SiteRankings({ siteId, summary, neverChecked, canManage, tab, onTab, on
             {t.key === tab && t.key === 'cannibalisation' && (
               <CannibalisationTab siteId={siteId} onOpen={(r) => onOpen({ id: r.keywordId, keyword: r.keyword, locationName: r.locationName, device: r.device })} />
             )}
+            {t.key === tab && t.key === 'competitors' && <CompetitorsTab siteId={siteId} siteUrl={siteUrl} keywordsCount={summary.keywordsCount} canManage={canManage} />}
           </TabsContent>
         ))}
       </Tabs>
     </div>
-  );
-}
-
-function LoadError({ error, what, onRetry }: { error: unknown; what: string; onRetry: () => void }) {
-  return (
-    <FormAlert tone="error">
-      <p>{getApiErrorMessage(error, `We could not load ${what}.`)}</p>
-      <p>
-        <button type="button" className="font-medium underline" onClick={onRetry}>
-          Try again
-        </button>
-      </p>
-    </FormAlert>
   );
 }

@@ -1,4 +1,5 @@
-import { AlertTriangle, Loader2, Shuffle } from 'lucide-react';
+import { AlertTriangle, Loader2, Shuffle, Star } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { PageLink } from '@/features/search-console/components/reports/cells';
 import type { RankKeyword } from '../../types';
 import { Rank } from '../cells';
@@ -34,5 +35,33 @@ export function UrlCell({ k }: { k: RankKeyword }) {
         </span>
       )}
     </span>
+  );
+}
+
+/**
+ * The key-keyword star: a toggle for managers (overtake alerts watch key
+ * keywords only), a plain mark for everyone else, nothing when not key.
+ */
+export function KeyStar({ k, busy, onToggle }: { k: RankKeyword; busy?: boolean; onToggle?: (k: RankKeyword) => void }) {
+  if (!onToggle) {
+    return k.isKey ? (
+      <span role="img" aria-label="Key keyword" title="Key keyword" className="shrink-0">
+        <Star className="size-3.5 fill-warn text-warn" aria-hidden />
+      </span>
+    ) : null;
+  }
+  const label = k.isKey ? `Unmark ${k.keyword} as a key keyword` : `Mark ${k.keyword} as a key keyword`;
+  return (
+    <button
+      type="button"
+      onClick={() => onToggle(k)}
+      disabled={busy}
+      aria-pressed={k.isKey}
+      aria-label={label}
+      title={k.isKey ? 'Key keyword: competitor overtakes alert you. Click to unmark.' : 'Mark as a key keyword to get competitor overtake alerts.'}
+      className="grid size-5 shrink-0 place-items-center rounded text-muted-foreground hover:bg-muted hover:text-warn focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
+    >
+      {busy ? <Loader2 className="size-3.5 animate-spin" aria-hidden /> : <Star className={cn('size-3.5', k.isKey && 'fill-warn text-warn')} aria-hidden />}
+    </button>
   );
 }

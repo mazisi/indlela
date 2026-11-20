@@ -1,16 +1,17 @@
 import { useSearchParams } from 'react-router';
 
-export type RankTab = 'keywords' | 'cannibalisation';
+export type RankTab = 'keywords' | 'cannibalisation' | 'competitors';
 
 export const RANK_TABS: readonly { key: RankTab; label: string }[] = [
   { key: 'keywords', label: 'Keywords' },
   { key: 'cannibalisation', label: 'Cannibalisation' },
+  { key: 'competitors', label: 'Competitors' },
 ];
 
 const DEFAULT_TAB: RankTab = 'keywords';
 
 /** A tab's own list state, cleared when the tab changes. */
-const LIST_KEYS = ['page', 'perPage', 'search', 'sort', 'direction', 'device', 'location', 'tag', 'bucket'];
+const LIST_KEYS = ['page', 'perPage', 'search', 'sort', 'direction', 'device', 'location', 'tag', 'bucket', 'key', 'only'];
 
 /** The site page's tab (`tab`, absent = Keywords); the Keywords table keeps its filters, sort and page alongside. */
 export function useRankParams() {

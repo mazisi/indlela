@@ -29,7 +29,7 @@ export function tidyDigitKeys<T>(value: unknown): T {
 }
 
 /** `-position` style, as the API takes it. */
-export const toApiSort = (sort: KeywordQuery['sort']) => (sort ? `${sort.direction === 'desc' ? '-' : ''}${sort.key}` : undefined);
+export const toApiSort = (sort: { key: string; direction: 'asc' | 'desc' } | undefined) => (sort ? `${sort.direction === 'desc' ? '-' : ''}${sort.key}` : undefined);
 
 /* ---- Workspace-wide ---- */
 
@@ -61,6 +61,7 @@ export async function getKeywords(siteId: number, query: KeywordQuery): Promise<
       location: query.location,
       tag: query.tag,
       bucket: query.bucket,
+      isKey: query.isKey ? 1 : undefined,
       sort: toApiSort(query.sort),
     },
   });

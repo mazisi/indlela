@@ -317,6 +317,49 @@ describe('RankTrackingSitePage', () => {
       await waitFor(() => expect(api.bulkKeywords).toHaveBeenLastCalledWith(7, 'delete', [501], undefined));
     });
 
+    it('stars a key keyword with its settings unchanged', async () => {
+      serve();
+      vi.mocked(api.updateKeyword).mockResolvedValue(keyword({ isKey: true }));
+      renderPage();
+
+      const row = await findRow('coffee beans johannesburg');
+      const star = within(row).getByRole('button', { name: 'Mark coffee beans johannesburg as a key keyword' });
+      expect(star).toHaveAttribute('aria-pressed', 'false');
+      vi.mocked(api.getKeywords).mockResolvedValue(page([keyword({ isKey: true }), NOT_RANKING]));
+      await userEvent.click(star);
+      await waitFor(() => expect(api.updateKeyword).toHaveBeenCalledWith(501, { frequency: 'daily', tags: ['shop'], isActive: true, isKey: true }));
+      await waitFor(() => expect(within(row).getByRole('button', { name: 'Unmark coffee beans johannesburg as a key keyword' })).toHaveAttribute('aria-pressed', 'true'));
+      expect(showToaster).toHaveBeenCalledWith('success', expect.stringContaining('is a key keyword'));
+    });
+
+    it('filters to key keywords through the URL', async () => {
+      serve();
+      renderPage();
+
+      await findRow('coffee beans johannesburg');
+      await userEvent.click(screen.getByRole('button', { name: 'Key keywords' }));
+      await waitFor(() => expect(location()).toContain('key=1'));
+      await waitFor(() => expect(api.getKeywords).toHaveBeenLastCalledWith(7, expect.objectContaining({ isKey: true, page: 1 })));
+      expect(screen.getByRole('button', { name: 'Key keywords' })).toHaveAttribute('aria-pressed', 'true');
+    });
+
+    it('bulk-marks and unmarks key keywords', async () => {
+      serve();
+      vi.mocked(api.bulkKeywords).mockResolvedValue();
+      renderPage();
+
+      await findRow('coffee beans johannesburg');
+      await userEvent.click(within(table()).getByRole('checkbox', { name: /Select all keywords/ }));
+      const bar = screen.getByRole('region', { name: 'Bulk actions' });
+      await userEvent.click(within(bar).getByRole('button', { name: 'Mark key' }));
+      await waitFor(() => expect(api.bulkKeywords).toHaveBeenCalledWith(7, 'mark_key', [501, 502], undefined));
+      expect(showToaster).toHaveBeenCalledWith('success', '2 keywords marked as key.');
+
+      await userEvent.click(within(table()).getByRole('checkbox', { name: /Select coffee beans johannesburg/ }));
+      await userEvent.click(within(screen.getByRole('region', { name: 'Bulk actions' })).getByRole('button', { name: 'Unmark key' }));
+      await waitFor(() => expect(api.bulkKeywords).toHaveBeenLastCalledWith(7, 'unmark_key', [501], undefined));
+    });
+
     it('edits a keyword’s frequency, day and tags in a drawer', async () => {
       serve();
       vi.mocked(api.updateKeyword).mockResolvedValue(keyword({ frequency: 'weekly', weeklyDay: 3 }));
@@ -380,6 +423,16 @@ describe('RankTrackingSitePage', () => {
   });
 
   describe('permissions', () => {
+    it('shows a viewer which keywords are key, without the toggle', async () => {
+      permissions.list = VIEWER;
+      serve({ rows: [keyword({ isKey: true }), NOT_RANKING] });
+      renderPage();
+
+      const row = await findRow('coffee beans johannesburg');
+      expect(within(row).getByRole('img', { name: 'Key keyword' })).toBeInTheDocument();
+      expect(within(await findRow('buy espresso machine')).queryByRole('img', { name: 'Key keyword' })).not.toBeInTheDocument();
+    });
+
     it('gives a viewer the data without Add, Check now, edit, selection or delete', async () => {
       permissions.list = VIEWER;
       serve();
@@ -391,6 +444,7 @@ describe('RankTrackingSitePage', () => {
       expect(screen.queryByRole('button', { name: /Edit / })).not.toBeInTheDocument();
       expect(screen.queryByRole('button', { name: /Delete / })).not.toBeInTheDocument();
       expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
+      expect(screen.queryByRole('button', { name: /as a key keyword/ })).not.toBeInTheDocument();
     });
   });
 
