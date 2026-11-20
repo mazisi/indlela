@@ -1,4 +1,4 @@
-import { Building2, FileBarChart, Gauge, LayoutDashboard, ScanSearch, Search, Settings, TrendingUp, type LucideIcon } from 'lucide-react';
+import { Building2, FileBarChart, Gauge, LayoutDashboard, MapPinned, ScanSearch, Search, Settings, TrendingUp, type LucideIcon } from 'lucide-react';
 
 /**
  * The menu. Access is per page: each sub-item (or a module without
@@ -28,7 +28,7 @@ export interface ModuleDef {
   internal?: boolean;
 }
 
-export type ModuleKey = 'dashboard' | 'clients' | 'search_console' | 'site_audit' | 'rank_tracking' | 'reports' | 'settings' | 'platform';
+export type ModuleKey = 'dashboard' | 'clients' | 'search_console' | 'site_audit' | 'rank_tracking' | 'local_grid' | 'reports' | 'settings' | 'platform';
 
 export const MODULES: readonly ModuleDef[] = [
   { key: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '' },
@@ -45,6 +45,7 @@ export const MODULES: readonly ModuleDef[] = [
   { key: 'search_console', label: 'Search Console', icon: Search, path: 'search-console' },
   { key: 'site_audit', label: 'Site audit', icon: ScanSearch, path: 'site-audit' },
   { key: 'rank_tracking', label: 'Rank tracking', icon: TrendingUp, path: 'rank-tracking' },
+  { key: 'local_grid', label: 'Local grid', icon: MapPinned, path: 'local-grid' },
   { key: 'reports', label: 'Reports', icon: FileBarChart, path: 'reports' },
   {
     key: 'settings',

@@ -11,7 +11,7 @@ const VALUE: Record<UsageLevel, string> = { ok: 'text-foreground', near: 'text-w
 const of = (used: number, limit: number) => `${formatNumber(used)} of ${formatNumber(limit)}`;
 
 /** A thin track filled to the share used; amber from 80 %, red at the limit. */
-function Meter({ label, used, limit, className }: { label: string; used: number; limit: number; className?: string }) {
+export function Meter({ label, used, limit, className }: { label: string; used: number; limit: number; className?: string }) {
   const level = usageLevel(used, limit);
   const percent = usagePercent(used, limit);
   return (

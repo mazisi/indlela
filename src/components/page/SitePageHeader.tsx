@@ -8,8 +8,8 @@ import { cn } from '@/lib/utils';
 import { StickyBar } from './StickyBar';
 
 /** The modules that have a page per site, in the order of the menu. */
-export type SiteModuleKey = Extract<ModuleKey, 'search_console' | 'site_audit' | 'rank_tracking' | 'reports'>;
-const SITE_MODULES: SiteModuleKey[] = ['search_console', 'site_audit', 'rank_tracking', 'reports'];
+export type SiteModuleKey = Extract<ModuleKey, 'search_console' | 'site_audit' | 'rank_tracking' | 'local_grid' | 'reports'>;
+const SITE_MODULES: SiteModuleKey[] = ['search_console', 'site_audit', 'rank_tracking', 'local_grid', 'reports'];
 
 /** Where a module shows one site: Search Console is one page with `?site=`, the others have `/:siteId`. */
 function siteModulePath(module: SiteModuleKey, siteId: number): string {
