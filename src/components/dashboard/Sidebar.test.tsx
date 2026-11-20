@@ -108,7 +108,25 @@ describe('Sidebar', () => {
       'view_settings_login_history',
       'view_settings_email_templates',
       'view_settings_workspace',
+      'view_platform_usage',
     ]);
+  });
+
+  it('hides the Platform group from anyone without view_platform_usage', () => {
+    renderSidebar(['view_dashboard', 'view_rank_tracking', 'view_settings_workspace']);
+
+    expect(nav().queryByRole('button', { name: 'Platform' })).not.toBeInTheDocument();
+    expect(nav().queryByRole('link', { name: 'Usage' })).not.toBeInTheDocument();
+    expect(nav().queryByText('Platform')).not.toBeInTheDocument();
+  });
+
+  it('shows Platform › Usage, last, to Indlela staff', async () => {
+    renderSidebar(['view_dashboard', 'view_settings_workspace', 'view_platform_usage']);
+
+    const groups = nav().getAllByRole('button', { name: /^(Settings|Platform)$/ });
+    expect(groups.map((b) => b.textContent)).toEqual(['Settings', 'Platform']);
+    await userEvent.click(nav().getByRole('button', { name: 'Platform' }));
+    expect(nav().getByRole('link', { name: 'Usage' })).toHaveAttribute('href', '/dashboard/platform/usage');
   });
 
   it('shows which version of the app is running', () => {

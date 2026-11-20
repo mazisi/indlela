@@ -9,6 +9,11 @@ import type { CatalogGroup, CatalogResource } from '../types';
 const ACTION_ORDER: Action[] = ['view', 'create', 'update', 'delete', 'approve'];
 const ACTION_ICONS: Record<Action, LucideIcon> = { view: Eye, create: Plus, update: SquarePen, delete: Trash2, approve: BadgeCheck };
 
+/** A line under a group's header where its pages need explaining (catalogue group key → text). */
+const GROUP_HELP: Record<string, string> = {
+  platform: 'Indlela staff only. Shows company spend and every workspace’s usage.',
+};
+
 interface PermissionGroupProps {
   group: CatalogGroup;
   held: ReadonlySet<string>;
@@ -35,6 +40,8 @@ export function PermissionGroup({ group, held, readOnly, expanded, onToggleExpan
   const all = namesIn(group.resources);
   const heldCount = all.filter((p) => held.has(p)).length;
   const bodyId = `perm-group-${group.key}`;
+  const help = GROUP_HELP[group.key];
+  const helpId = help ? `perm-group-${group.key}-help` : undefined;
 
   // Select all / none for a set of pages and actions, keeping View consistent.
   const setAll = (action: Action | undefined, checked: boolean) => {
@@ -54,6 +61,7 @@ export function PermissionGroup({ group, held, readOnly, expanded, onToggleExpan
           className="flex min-w-0 flex-1 items-center gap-2 text-left"
           aria-expanded={expanded}
           aria-controls={bodyId}
+          aria-describedby={helpId}
         >
           <ChevronRight className={cn('size-4 shrink-0 text-muted-foreground transition-transform', expanded && 'rotate-90')} aria-hidden />
           {Icon && <Icon className="size-4 shrink-0 text-muted-foreground" aria-hidden />}
@@ -74,6 +82,11 @@ export function PermissionGroup({ group, held, readOnly, expanded, onToggleExpan
           </label>
         )}
       </div>
+      {help && (
+        <p id={helpId} className="-mt-1 px-3 pb-2 pl-15 text-xs text-muted-foreground">
+          {help}
+        </p>
+      )}
 
       {expanded && (
         <div id={bodyId} className="overflow-x-auto border-t">

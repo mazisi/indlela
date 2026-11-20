@@ -34,6 +34,9 @@ const GROUPS: CatalogGroup[] = [
   },
 ];
 
+/** The platform workspace's catalogue adds Platform › Usage (view only). */
+const PLATFORM: CatalogGroup = { key: 'platform', label: 'Platform', resources: [{ key: 'platform_usage', label: 'Usage', actions: ['view'], grantable: true }] };
+
 const role = (over: Partial<Role>): Role => ({
   id: 2,
   name: 'Analyst',
@@ -95,6 +98,28 @@ describe('RolesPage', () => {
     // Overview pages are view only.
     expect(screen.queryByRole('checkbox', { name: 'Create Reports overview' })).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: /History/ })).toHaveTextContent('4');
+  });
+
+  it('shows Platform › Usage as a view-only row, with a staff-only note, when the catalogue has it', async () => {
+    vi.mocked(api.getRoles).mockResolvedValue({ ...response(), groups: [...GROUPS, PLATFORM] });
+    await renderPage();
+
+    const platform = screen.getByRole('button', { name: /^Platform/ });
+    expect(platform).toHaveTextContent('(0/1)');
+    expect(platform).toHaveAccessibleDescription('Indlela staff only. Shows company spend and every workspace’s usage.');
+
+    await openGroup('Platform');
+    const body = within(document.getElementById('perm-group-platform') as HTMLElement);
+    expect(body.getAllByRole('columnheader').map((h) => h.textContent)).toEqual(['Platform', 'View']);
+    expect(body.getAllByRole('checkbox')).toHaveLength(1);
+    await userEvent.click(box('View Usage'));
+    expect(box('View Usage')).toBeChecked();
+  });
+
+  it('has no Platform group outside the platform workspace', async () => {
+    await renderPage();
+    expect(screen.queryByRole('button', { name: /^Platform/ })).not.toBeInTheDocument();
+    expect(screen.queryByText(/Indlela staff only/)).not.toBeInTheDocument();
   });
 
   it('keeps View with every action and saves the pages the role can be given', async () => {
