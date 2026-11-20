@@ -10,10 +10,12 @@ const ACTION: Record<ChangeEntry['action'], { label: string; dot: string }> = {
   create: { label: 'Added', dot: 'bg-ok' },
   update: { label: 'Changed', dot: 'bg-primary' },
   delete: { label: 'Removed', dot: 'bg-bad' },
+  restore: { label: 'Restored', dot: 'bg-ok' },
   view: { label: 'Viewed', dot: 'bg-warn' },
 };
 
-const show = (v: FieldChange['old']) => (v === null || v === '' ? '—' : typeof v === 'boolean' ? (v ? 'Yes' : 'No') : String(v));
+const show = (v: FieldChange['old']) =>
+  v === null || v === '' ? '—' : typeof v === 'boolean' ? (v ? 'Yes' : 'No') : Array.isArray(v) ? v.join(', ') || '—' : String(v);
 
 function ChangeList({ entry, fieldLabels }: { entry: ChangeEntry; fieldLabels: Record<string, string> }) {
   // Additions list what was set; changes show old → new, skipping ones that read the same.
