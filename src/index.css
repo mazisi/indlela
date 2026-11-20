@@ -31,6 +31,8 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
+  --color-chart-current: var(--chart-current);
+  --color-chart-compare: var(--chart-compare);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -133,6 +135,11 @@
   --ph: #9a3412;
   --ph-soft: #fed7aa;
   --sun-soft: #fff4e6;
+
+  /* Search Console chart: the period (categorical slot 1 blue) and the compare period (neutral, drawn dashed). */
+  --chart-current: #2a78d6;
+  --chart-compare: #828c88;
+  --chart-grid: #e6eae8;
 }
 
 .dark {
@@ -167,6 +174,10 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+
+  --chart-current: #3987e5;
+  --chart-compare: #7f7e78;
+  --chart-grid: oklch(1 0 0 / 8%);
 }
 
 /* this is for dashboard charts */
@@ -502,4 +513,10 @@
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }
+}
+
+/* Search Console "importing" bar: an indeterminate sweep. */
+@keyframes sc-indeterminate {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
 }

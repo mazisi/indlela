@@ -1,5 +1,5 @@
 import { lazy, type ReactNode } from 'react';
-import { type RouteObject } from 'react-router';
+import { Navigate, useLocation, type RouteObject } from 'react-router';
 import { RequireAuth } from '@/utils/RequireAuth';
 import Unauthorized from '@/dashboard/Unauthorized';
 import SimpleErrorBoundary from '@/components/SimpleErrorBoundary';
@@ -19,6 +19,7 @@ const EmailTemplatesPage = lazy(() => import('@/features/email-templates/pages/E
 const WorkspacePage = lazy(() => import('@/features/workspaces/pages/WorkspacePage'));
 const ClientsPage = lazy(() => import('@/features/clients/pages/ClientsPage'));
 const SitesPage = lazy(() => import('@/features/sites/pages/SitesPage'));
+const SearchConsolePage = lazy(() => import('@/features/search-console/pages/SearchConsolePage'));
 
 // Friendly fallback when a lazy route chunk fails to load (network/deploy mismatch).
 const boundary = (element: ReactNode) => <SimpleErrorBoundary fallback={<ErrorFallback />}>{element}</SimpleErrorBoundary>;
@@ -28,6 +29,7 @@ const guarded = (permission: string, element: ReactNode) => boundary(<ProtectedR
 const PAGES: Record<string, ReactNode> = {
   'clients.clients': <ClientsPage />,
   'clients.sites': <SitesPage />,
+  search_console: <SearchConsolePage />,
   'settings.users': <UsersPage />,
   'settings.roles': <RolesPage />,
   'settings.login-history': <LoginHistoryPage />,
@@ -54,7 +56,14 @@ const moduleRoutes: RouteObject[] = MODULES.filter((m) => m.path !== '').map((m)
     : { path: m.path, element: guarded(permissionFor(m), PAGES[m.key] ?? <ModulePlaceholder moduleKey={m.key} />) },
 );
 
+/** Google's OAuth return lands on `/search-console?google=…` (the API's FRONTEND_URL + path); keep the params. */
+function SearchConsoleReturn() {
+  const { search } = useLocation();
+  return <Navigate to={`/dashboard/search-console${search}`} replace />;
+}
+
 const routes: RouteObject[] = [
+  { path: '/search-console', element: <SearchConsoleReturn /> },
   {
     path: '/dashboard',
     element: (
